@@ -2,7 +2,7 @@
 
 <img src="./assets/pydoge.png" alt="pydoge logo" width="60%" style="display: block; margin: 0 auto;">
 
-**Modern async Python SDK for Dogecoin — engineered for 2026.** High-level wallet abstractions, Doginals support, quantum-resistant transactions, and exceptional developer experience.
+**Modern async Python SDK for Dogecoin — engineered for 2026.** High-level wallet abstractions, Dogenals support, quantum-resistant transactions, and exceptional developer experience.
 
 [![CI](https://github.com/jonheaven/pydoge/actions/workflows/ci.yml/badge.svg)](https://github.com/jonheaven/pydoge/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/pydoge)](https://pypi.org/project/pydoge/)
@@ -16,7 +16,7 @@ pydoge is the definitive Python SDK for Dogecoin development in 2026, engineered
 - **Async Excellence**: Fully asynchronous architecture optimized for high-performance Python applications
 - **Type Safety**: Comprehensive Pydantic validation and mypy integration for robust development
 - **Developer-Centric**: Intuitive high-level APIs with granular low-level control
-- **Future-Proof**: Native support for Doginals, inscriptions, and quantum-resistant transactions
+- **Future-Proof**: Native support for Dogenals, inscriptions, and quantum-resistant transactions
 - **Enterprise-Ready**: Leverages libdogecoin with seamless JSON-RPC fallback for maximum compatibility
 
 **Why Choose pydoge?**
@@ -105,7 +105,7 @@ pydoge new-address --label "my_wallet"
 ### Roadmap
 - **v1.1 (Q2 2026)**: Advanced transaction management with fee estimation and batch operations
 - **v1.2 (Q3 2026)**: Multi-wallet support and HD wallet integration
-- **v2.0 (Q4 2026)**: Full Doginals implementation and inscription support
+- **v2.0 (Q4 2026)**: Full Dogenals implementation and inscription support
 - **v2.1 (2027)**: Quantum-resistant transaction protocols and enhanced security features
 
 ## Architecture
