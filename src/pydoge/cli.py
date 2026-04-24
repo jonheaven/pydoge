@@ -57,10 +57,10 @@ async def handle_wallet_command(
             result = await getattr(wallet, command)(*args)
             typer.echo(result)
     except ValueError as e:
-        typer.echo(f"❌ Input validation error: {e}", err=True)
+        typer.echo(f"Error: Input validation error: {e}", err=True)
         raise typer.Exit(1) from None
     except AuthenticationError as e:
-        typer.echo(f"❌ Authentication failed: {e}", err=True)
+        typer.echo(f"Error: Authentication failed: {e}", err=True)
         raise typer.Exit(1) from None
     except ConnectionError as e:
         typer.echo(f"❌ Connection error: {e}", err=True)

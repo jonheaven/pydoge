@@ -1,6 +1,8 @@
-# pydoge 🐕
+# pydoge
 
-**Modern async Python SDK for Dogecoin — built for 2026.** High-level wallet, Doginals, quantum-safe txs, and elite developer experience.
+<img src="./assets/pydoge.png" alt="pydoge logo" width="60%" style="display: block; margin: 0 auto;">
+
+**Modern async Python SDK for Dogecoin — engineered for 2026.** High-level wallet abstractions, Doginals support, quantum-resistant transactions, and exceptional developer experience.
 
 [![CI](https://github.com/jonheaven/pydoge/actions/workflows/ci.yml/badge.svg)](https://github.com/jonheaven/pydoge/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/pydoge)](https://pypi.org/project/pydoge/)
@@ -8,21 +10,21 @@
 
 ## Vision
 
-pydoge is the premium Python SDK for Dogecoin development in 2026. We don't reinvent the wheel—we study the best existing work, extract superior patterns, and build something clearly better.
+pydoge is the definitive Python SDK for Dogecoin development in 2026, engineered with uncompromising standards. We meticulously analyze leading libraries, distill their finest patterns, and forge a solution that sets new benchmarks for quality and performance.
 
-**Core Philosophy:**
-- **Async-first**: Everything is async by default for modern Python apps
-- **Type-safe**: Full Pydantic models and mypy support
-- **Delightful DX**: High-level abstractions with low-level power when needed
-- **2026-ready**: First-class support for Doginals, inscriptions, and quantum-resistant transactions
-- **Production-grade**: Built on libdogecoin where possible, with JSON-RPC fallback
+**Core Principles:**
+- **Async Excellence**: Fully asynchronous architecture optimized for high-performance Python applications
+- **Type Safety**: Comprehensive Pydantic validation and mypy integration for robust development
+- **Developer-Centric**: Intuitive high-level APIs with granular low-level control
+- **Future-Proof**: Native support for Doginals, inscriptions, and quantum-resistant transactions
+- **Enterprise-Ready**: Leverages libdogecoin with seamless JSON-RPC fallback for maximum compatibility
 
-**Why pydoge?**
-- Clean, modern code that feels like web3.py but for Dogecoin
-- Comprehensive error handling with custom exceptions
-- Excellent documentation and examples that actually work
-- Professional project structure from day one
-- Zero tolerance for messy code
+**Why Choose pydoge?**
+- Precision-crafted code with the familiarity of web3.py, optimized for Dogecoin
+- Robust error management with detailed custom exceptions
+- Comprehensive documentation with verified, working examples
+- Enterprise-grade project structure from inception
+- Unwavering commitment to code quality and maintainability
 
 ## Quickstart
 
@@ -101,10 +103,10 @@ pydoge new-address --label "my_wallet"
 - ✅ GitHub Actions CI
 
 ### Roadmap
-- **v1.1**: Enhanced transaction handling
-- **v1.2**: Multi-wallet support
-- **v2.0**: Advanced Dogecoin features
-- **Future**: Doginals, quantum-resistant transactions
+- **v1.1 (Q2 2026)**: Advanced transaction management with fee estimation and batch operations
+- **v1.2 (Q3 2026)**: Multi-wallet support and HD wallet integration
+- **v2.0 (Q4 2026)**: Full Doginals implementation and inscription support
+- **v2.1 (2027)**: Quantum-resistant transaction protocols and enhanced security features
 
 ## Architecture
 
@@ -193,4 +195,4 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ---
 
-**Built with ❤️ for the Dogecoin community. Much wow!**
+Built for the Dogecoin ecosystem.
