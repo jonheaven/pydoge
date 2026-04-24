@@ -6,16 +6,29 @@ from .exceptions import (
     ConnectionError,
     PydogeError,
     RPCError,
-    ValidationError,
+)
+from .models import (
+    AddressInfo,
+    Balance,
+    BlockchainInfo,
+    Transaction,
 )
 from .wallet import Wallet
 
 __all__ = [
+    # Core classes
     "Client",
     "Wallet",
+    # Exceptions
     "PydogeError",
     "RPCError",
     "ConnectionError",
-    "ValidationError",
     "AuthenticationError",
+    # Models
+    "BlockchainInfo",
+    "AddressInfo",
+    "Balance",
+    "Transaction",
+    # Version
+    "__version__",
 ]

@@ -101,10 +101,10 @@ pydoge new-address --label "my_wallet"
 - ✅ GitHub Actions CI
 
 ### Roadmap
-- **v1.1**: Doginal reading and basic creation
-- **v1.2**: Transaction building and signing
-- **v2.0**: Quantum-resistant transaction support
-- **v2.1**: Advanced wallet features (HD keys, multisig)
+- **v1.1**: Enhanced transaction handling
+- **v1.2**: Multi-wallet support
+- **v2.0**: Advanced Dogecoin features
+- **Future**: Doginals, quantum-resistant transactions
 
 ## Architecture
 
