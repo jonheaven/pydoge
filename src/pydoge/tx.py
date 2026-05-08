@@ -3,11 +3,14 @@
 Dogecoin Raw Transaction Decoder
 Pure Python implementation (no external dependencies).
 
-Supports legacy transactions + Doginal / Dogemap inscriptions.
+Supports:
+- Legacy transactions
+- SegWit (BIP141) transactions
+- Doginal / Dogemap inscriptions ("ord" protocol)
 """
 
 import struct
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List, Dict, Any, Tuple, Optional
 
 
@@ -42,7 +45,7 @@ def decode_varint(data: bytes, offset: int) -> Tuple[int, int]:
 
 
 def decode_script(script_hex: str) -> List[Dict[str, Any]]:
-    """Disassemble a script (scriptSig or scriptPubKey) into ops + data pushes."""
+    """Disassemble a script into human-readable operations and data pushes."""
     if not script_hex:
         return []
     try:
@@ -80,6 +83,21 @@ def decode_script(script_hex: str) -> List[Dict[str, Any]]:
     return ops
 
 
+def _parse_witness(tx: bytes, offset: int, vin_count: int) -> Tuple[List[List[bytes]], int]:
+    """Parse SegWit witness data. Returns (witness_stacks, new_offset)"""
+    witness: List[List[bytes]] = []
+    for _ in range(vin_count):
+        stack_count, offset = decode_varint(tx, offset)
+        stack: List[bytes] = []
+        for _ in range(stack_count):
+            item_len, offset = decode_varint(tx, offset)
+            item = tx[offset:offset + item_len]
+            stack.append(item)
+            offset += item_len
+        witness.append(stack)
+    return witness, offset
+
+
 @dataclass
 class DecodedInput:
     txid: str
@@ -87,6 +105,7 @@ class DecodedInput:
     scriptSig: str
     scriptSig_asm: List[Dict[str, Any]]
     sequence: int
+    witness: Optional[List[bytes]] = None   # for SegWit inputs
 
 
 @dataclass
@@ -105,10 +124,44 @@ class DecodedTx:
     locktime: int
     size: int
     hex: str
+    is_segwit: bool = False
+    witness: Optional[List[List[bytes]]] = field(default=None)  # raw witness stacks
+
+    def get_inscriptions(self) -> List[Dict[str, Any]]:
+        """Extract Doginal / inscription data from inputs (if present)."""
+        inscriptions = []
+        for inp in self.vin:
+            script = inp.scriptSig_asm
+            # Look for "ord" protocol pattern
+            for i, op in enumerate(script):
+                if op.get("ascii") == "ord":
+                    # Typical Doginal: ord OP_1 content-type OP_0 body
+                    content_type = None
+                    body = None
+                    if i + 4 < len(script):
+                        if script[i+1].get("op") == "OP_1" and script[i+2].get("ascii"):
+                            content_type = script[i+2]["ascii"]
+                        if script[i+3].get("op") == "OP_0" and i+4 < len(script):
+                            body_hex = script[i+4].get("hex", "")
+                            try:
+                                body = bytes.fromhex(body_hex).decode("utf-8", errors="replace")
+                            except Exception:
+                                body = body_hex
+                    inscriptions.append({
+                        "input_index": self.vin.index(inp),
+                        "content_type": content_type or "unknown",
+                        "body": body,
+                        "raw_script": script
+                    })
+                    break
+        return inscriptions
 
 
 def decode_raw_transaction(raw_tx_hex: str) -> DecodedTx:
-    """Decode a Dogecoin (or Bitcoin) raw transaction hex."""
+    """Decode a Dogecoin (Bitcoin-compatible) raw transaction.
+
+    Supports legacy + SegWit (BIP141).
+    """"
     tx = bytes.fromhex(raw_tx_hex.strip())
     if len(tx) < 10:
         raise ValueError("Transaction too short")
@@ -116,6 +169,12 @@ def decode_raw_transaction(raw_tx_hex: str) -> DecodedTx:
     offset = 0
     version = struct.unpack("<I", tx[offset:offset+4])[0]
     offset += 4
+
+    # Check for SegWit marker + flag
+    is_segwit = False
+    if offset + 2 <= len(tx) and tx[offset] == 0x00 and tx[offset+1] == 0x01:
+        is_segwit = True
+        offset += 2  # skip marker + flag
 
     vin_count, offset = decode_varint(tx, offset)
     vin: List[DecodedInput] = []
@@ -152,6 +211,15 @@ def decode_raw_transaction(raw_tx_hex: str) -> DecodedTx:
             scriptPubKey_asm=decode_script(spk)
         ))
 
+    # Parse witness if SegWit
+    witness = None
+    if is_segwit:
+        witness, offset = _parse_witness(tx, offset, vin_count)
+        # attach witness to inputs
+        for i, w in enumerate(witness):
+            if i < len(vin):
+                vin[i].witness = w
+
     locktime = struct.unpack("<I", tx[offset:offset+4])[0] if offset + 4 <= len(tx) else 0
 
     return DecodedTx(
@@ -160,21 +228,25 @@ def decode_raw_transaction(raw_tx_hex: str) -> DecodedTx:
         vout=vout_list,
         locktime=locktime,
         size=len(tx),
-        hex=raw_tx_hex
+        hex=raw_tx_hex,
+        is_segwit=is_segwit,
+        witness=witness
     )
 
 
 def pretty_print_tx(tx: DecodedTx) -> None:
-    """Pretty-print a decoded transaction."""
-    print("=" * 70)
-    print(f"DOGECOIN RAW TX DECODER  |  v{tx.version}  |  {tx.size} bytes")
-    print("=" * 70)
+    """Pretty-print a decoded transaction (legacy or SegWit)."""
+    print("=" * 72)
+    segwit_str = " [SegWit]" if tx.is_segwit else ""
+    print(f"DOGECOIN RAW TX DECODER  |  v{tx.version}{segwit_str}  |  {tx.size} bytes")
+    print("=" * 72)
     print(f"Locktime: {tx.locktime}")
     print()
 
     print(f"INPUTS ({len(tx.vin)}):")
     for i, inp in enumerate(tx.vin):
-        print(f"  [{i}] {inp.txid}:{inp.vout}  seq={inp.sequence}")
+        w_str = " + witness" if inp.witness else ""
+        print(f"  [{i}] {inp.txid}:{inp.vout}  seq={inp.sequence}{w_str}")
         for op in inp.scriptSig_asm:
             if op.get("ascii"):
                 print(f"      {op['op']}: \"{op['ascii']}\"")
@@ -186,4 +258,17 @@ def pretty_print_tx(tx: DecodedTx) -> None:
         print(f"  [{i}] {out.value_doge:.8f} DOGE")
         for op in out.scriptPubKey_asm:
             print(f"      {op['op']}")
-    print("=" * 70)
+
+    if tx.is_segwit and tx.witness:
+        print(f"\nWITNESS ({len(tx.witness)} stacks):")
+        for i, stack in enumerate(tx.witness):
+            print(f"  Input {i}: {len(stack)} items")
+
+    # Show inscriptions if any
+    inscriptions = tx.get_inscriptions()
+    if inscriptions:
+        print(f"\n🐕 DOGINAL INSCRIPTIONS ({len(inscriptions)}):")
+        for ins in inscriptions:
+            print(f"  Content-Type: {ins['content_type']}")
+            print(f"  Body preview: {str(ins['body'])[:80]}...")
+    print("=" * 72)
