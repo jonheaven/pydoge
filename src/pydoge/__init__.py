@@ -13,12 +13,18 @@ from .models import (
     BlockchainInfo,
     Transaction,
 )
+from .tx import decode_raw_transaction, decode_script, pretty_print_tx, DecodedTx
 from .wallet import Wallet
 
 __all__ = [
     # Core classes
     "Client",
     "Wallet",
+    # Tx decoder
+    "decode_raw_transaction",
+    "decode_script",
+    "pretty_print_tx",
+    "DecodedTx",
     # Exceptions
     "PydogeError",
     "RPCError",
