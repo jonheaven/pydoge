@@ -123,3 +123,56 @@ class AddressInfo(BaseModel):
                 if not re.match(r"^[a-fA-F0-9]*$", pubkey):
                     raise ValueError("Invalid public key format")
         return v
+
+
+class DMPPayload(BaseModel):
+    """Model for DMP operation payloads.
+
+    Represents a Dogenals Marketplace Protocol operation payload.
+    """
+
+    p: str = Field(..., description="Protocol identifier", const="dmp")
+    v: str = Field(..., description="Protocol version")
+    op: str = Field(..., description="Operation type")
+    inscription_id: str | None = Field(None, description="Target inscription ID")
+    price: str | None = Field(None, description="Price in koinu")
+    seller: str | None = Field(None, description="Seller address")
+    bidder: str | None = Field(None, description="Bidder address")
+    buyer: str | None = Field(None, description="Buyer address")
+    settlement_txid: str | None = Field(None, description="Settlement transaction ID")
+    from_address: str | None = Field(None, description="Transfer from address")
+    to_address: str | None = Field(None, description="Transfer to address")
+    transfer_type: str | None = Field(None, description="Transfer type")
+    transfer_txid: str | None = Field(None, description="Transfer transaction ID")
+    ts: int | None = Field(None, description="Timestamp")
+
+    @field_validator("inscription_id", "settlement_txid", "transfer_txid")
+    @classmethod
+    def validate_txid_fields(cls, v: str | None) -> str | None:
+        """Validate transaction ID format."""
+        if v is not None and not re.match(r"^[a-fA-F0-9]{64}$", v):
+            raise ValueError("Invalid transaction ID format")
+        return v
+
+    @field_validator("seller", "bidder", "buyer", "from_address", "to_address")
+    @classmethod
+    def validate_address_fields(cls, v: str | None) -> str | None:
+        """Validate Dogecoin address format."""
+        if v is not None and not re.match(r"^D[A-Za-z0-9]{25,34}$", v):
+            raise ValueError("Invalid Dogecoin address format")
+        return v
+
+    @field_validator("price")
+    @classmethod
+    def validate_price(cls, v: str | None) -> str | None:
+        """Validate price format (positive integer string)."""
+        if v is not None and not re.match(r"^[1-9][0-9]*$", v):
+            raise ValueError("Invalid price format")
+        return v
+
+
+class DMPValidationResult(BaseModel):
+    """Model for DMP payload validation results."""
+
+    valid: bool = Field(..., description="Whether payload is valid")
+    issues: list[str] = Field(default_factory=list, description="Validation issues")

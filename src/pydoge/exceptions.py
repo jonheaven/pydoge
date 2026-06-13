@@ -33,3 +33,9 @@ class AuthenticationError(PydogeError):
     """Raised when authentication fails."""
 
     pass
+
+
+class DMPValidationError(PydogeError):
+    """Raised when DMP payload validation fails."""
+
+    pass

@@ -113,3 +113,29 @@ class Wallet:
             raise ValueError("Invalid Dogecoin address format")
 
         return await self.client.getaddressinfo(address)
+
+    async def validate_address(self, address: str) -> bool:
+        """Validate a Dogecoin address format and check if it's valid on the network.
+
+        This is a convenience method that combines basic format validation
+        with network validation via getaddressinfo.
+
+        Args:
+            address: Dogecoin address to validate
+
+        Returns:
+            bool: True if address is valid, False otherwise
+
+        Raises:
+            ConnectionError: If connection fails
+        """
+        # Basic format check
+        if not re.match(r"^D[A-Za-z0-9]{25,34}$", address):
+            return False
+
+        try:
+            info = await self.get_address_info(address)
+            return info.isvalid
+        except Exception:
+            # If we can't get info, consider it invalid
+            return False
